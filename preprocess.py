@@ -7,7 +7,7 @@ def get_experiment_mask(df_res):
     cols_to_join = df_res.filter(regex=r"^break\d+\.duration$").columns
     df_res["breaks"] = df_res[cols_to_join].fillna("").astype(str).agg("".join, axis=1)
 
-    df_breaks_filtered = df_res.dropna(subset=["breaks"]).copy()
+    df_breaks_filtered = df_res.copy()
     df_breaks_filtered["duration_seconds"] = pd.to_numeric(
         df_breaks_filtered["breaks"], errors="coerce"
     )
