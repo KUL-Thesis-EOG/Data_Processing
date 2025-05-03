@@ -1,0 +1,66 @@
+Total parameters expected: 56
+Parameter parquet files saved (reported): 56
+Parameter files passing basic check: 56
+Raw window parquet files saved (reported): 2
+
+List of saved parameter files reported:
+- Mean_horizontal_filtered.parquet
+- Median_horizontal_filtered.parquet
+- Variance_horizontal_filtered.parquet
+- Skewness_horizontal_filtered.parquet
+- Kurtosis_horizontal_filtered.parquet
+- RMS_horizontal_filtered.parquet
+- ZeroCrossings_horizontal_filtered.parquet
+- FFT_Mean_horizontal_filtered.parquet
+- FFT_Std_horizontal_filtered.parquet
+- FFT_Max_horizontal_filtered.parquet
+- STFT_Mean_horizontal_filtered.parquet
+- STFT_Std_horizontal_filtered.parquet
+- WPT_Mean_horizontal_filtered.parquet
+- WPT_Std_horizontal_filtered.parquet
+- ApEn_horizontal_filtered.parquet
+- SampEn_horizontal_filtered.parquet
+- PeEn_horizontal_filtered.parquet
+- DispEn_horizontal_filtered.parquet
+- TsEn_horizontal_filtered.parquet
+- ReEn_horizontal_filtered.parquet
+- ShEn_spectral_horizontal_filtered.parquet
+- ShEn_manual_horizontal_filtered.parquet
+- LZC_horizontal_filtered.parquet
+- DFA_horizontal_filtered.parquet
+- HuEx_horizontal_filtered.parquet
+- CD_horizontal_filtered.parquet
+- HFD_horizontal_filtered.parquet
+- FuzEn_horizontal_filtered.parquet
+- Mean_vertical_filtered.parquet
+- Median_vertical_filtered.parquet
+- Variance_vertical_filtered.parquet
+- Skewness_vertical_filtered.parquet
+- Kurtosis_vertical_filtered.parquet
+- RMS_vertical_filtered.parquet
+- ZeroCrossings_vertical_filtered.parquet
+- FFT_Mean_vertical_filtered.parquet
+- FFT_Std_vertical_filtered.parquet
+- FFT_Max_vertical_filtered.parquet
+- STFT_Mean_vertical_filtered.parquet
+- STFT_Std_vertical_filtered.parquet
+- WPT_Mean_vertical_filtered.parquet
+- WPT_Std_vertical_filtered.parquet
+- ApEn_vertical_filtered.parquet
+- SampEn_vertical_filtered.parquet
+- PeEn_vertical_filtered.parquet
+- DispEn_vertical_filtered.parquet
+- TsEn_vertical_filtered.parquet
+- ReEn_vertical_filtered.parquet
+- ShEn_spectral_vertical_filtered.parquet
+- ShEn_manual_vertical_filtered.parquet
+- LZC_vertical_filtered.parquet
+- DFA_vertical_filtered.parquet
+- HuEx_vertical_filtered.parquet
+- CD_vertical_filtered.parquet
+- HFD_vertical_filtered.parquet
+- FuzEn_vertical_filtered.parquet
+
+List of saved raw window files reported:
+- raw_windows_horizontal_filtered.parquet
+- raw_windows_vertical_filtered.parquet
