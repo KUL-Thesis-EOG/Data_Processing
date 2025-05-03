@@ -104,13 +104,17 @@ def preprocess_data_flat(participant: str, aggregate: int, binary=True):
 
     df_x = df_final_full.drop("F_ISA", axis=1)
 
-    x_full = pd.DataFrame(df_x.groupby(grouping_key_full).agg("mean"))
     y_full = df_final_full["F_ISA"].groupby(grouping_key_full).mean()
 
     if binary:
         y_full = y_full.map(lambda x: x > 3)
 
+    unique_groups = sorted(set(grouping_key_full))
+    x_full = pd.DataFrame(index=unique_groups)
+
     for k, v in aggregations.items():
-        x_full = x_full.join(df_x.groupby(grouping_key_full).agg(v), rsuffix=k)
+        agg_result = df_x.groupby(grouping_key_full).agg(v)
+        agg_result.columns = [f"{col}_{k}" for col in agg_result.columns]
+        x_full = x_full.join(agg_result)
 
     return x_full, y_full
