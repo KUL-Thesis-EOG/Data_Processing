@@ -67,10 +67,7 @@ def preprocess_features(participant):
     return df_feat.resample("1s").first()
 
 
-def preprocess_data_flat(
-    participant: str,
-    aggregate: int,
-):
+def preprocess_data_flat(participant: str, aggregate: int, binary=True):
     # Load raw experiment data
     df_res = pd.read_parquet(f"data/{participant}_pavlovia_raw_data.parquet").set_index(
         "timestamp"
@@ -108,9 +105,10 @@ def preprocess_data_flat(
     df_x = df_final_full.drop("F_ISA", axis=1)
 
     x_full = pd.DataFrame(df_x.groupby(grouping_key_full).agg("mean"))
-    y_full = (
-        df_final_full["F_ISA"].groupby(grouping_key_full).mean().map(lambda x: x > 3)
-    )
+    y_full = df_final_full["F_ISA"].groupby(grouping_key_full).mean()
+
+    if binary:
+        y_full = y_full.map(lambda x: x > 3)
 
     for k, v in aggregations.items():
         x_full = x_full.join(df_x.groupby(grouping_key_full).agg(v), rsuffix=k)
