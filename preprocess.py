@@ -44,20 +44,27 @@ def get_experiment_mask(df_res):
 
 def get_isa_responses(df_res):
     """Extract ISA responses from df_res."""
-    return df_res["slider.response"].rename("F_ISA").bfill().resample("1s").ffill()
+    return (
+        df_res["slider.response"]
+        .rename("F_ISA")
+        .resample("1s")
+        .nearest(limit=1)
+        .interpolate(method="quadratic")
+    )
 
 
-def preprocess_raw_eog(participant):
-    """Load and preprocess raw EOG data."""
-    # Load raw EOG data from processed data file
-    df_eog = pd.read_parquet(f"data/{participant}_processed_data.parquet")
+def preprocess_features(participant):
+    """Load and preprocess feature data."""
+    df_feat = pd.DataFrame()
 
-    # Select the EOG channels
-    eog_channels = ["horizontal_filtered", "vertical_filtered"]
-    df_eog = df_eog[eog_channels]
+    for x in pd.read_parquet(
+        f"results/{participant}_eog_complexity_windowed/processing_summary.parquet"
+    )["saved_parameter_files_list"][0]:
+        df_feat[x.removesuffix(".parquet")] = pd.read_parquet(
+            f"results/{participant}_eog_complexity_windowed/{x}"
+        )
 
-    # Resample to 1s if needed (the processed data might already be at a different sampling rate)
-    return df_eog.resample("1s").first()
+    return df_feat.resample("1s").first()
 
 
 def preprocess_data_flat(
@@ -73,9 +80,9 @@ def preprocess_data_flat(
 
     df_isa = get_isa_responses(df_res)
 
-    df_eog = preprocess_raw_eog(participant)
+    df_feat = preprocess_features(participant)
 
-    df_final = df_eog.join(df_isa).mask(df_breaks.is_break).dropna()
+    df_final = df_feat.join(df_isa).mask(df_breaks.is_break).dropna()
 
     grouping_key = np.arange(len(df_final)) // aggregate
 
@@ -107,73 +114,5 @@ def preprocess_data_flat(
 
     for k, v in aggregations.items():
         x_full = x_full.join(df_x.groupby(grouping_key_full).agg(v), rsuffix=k)
-
-    return x_full, y_full
-
-
-def preprocess_data(
-    participant: str,
-    aggregate: int,
-):
-    """
-    Preprocess raw EOG data for deep learning models without flattening.
-
-    Args:
-        participant: Participant ID
-        aggregate: Window size (number of samples per window)
-
-    Returns:
-        X: numpy array of shape (n_samples, window_size, n_features)
-        y: numpy array of shape (n_samples,) with binary labels (ISA > 3)
-    """
-    # Load raw experiment data
-    df_res = pd.read_parquet(f"data/{participant}_pavlovia_raw_data.parquet").set_index(
-        "timestamp"
-    )
-
-    df_breaks = get_experiment_mask(df_res)
-
-    df_isa = get_isa_responses(df_res)
-
-    # Load raw EOG signals instead of features
-    df_eog = preprocess_raw_eog(participant)
-
-    # Join with ISA and mask by breaks
-    df_final = df_eog.join(df_isa).mask(df_breaks.is_break).dropna()
-
-    grouping_key = np.arange(len(df_final)) // aggregate
-
-    group_counts = df_final.groupby(grouping_key).size()
-
-    full_groups = group_counts[group_counts == aggregate].index
-
-    mask_full_groups = pd.Series(grouping_key).isin(full_groups).values
-
-    df_final_full = df_final[mask_full_groups]
-    grouping_key_full = grouping_key[mask_full_groups]
-
-    # Prepare features (excluding the target column)
-    df_x = df_final_full.drop("F_ISA", axis=1)
-
-    # Get the number of samples, features, and unique groups
-    n_samples = len(full_groups)
-    n_features = df_x.shape[1]  # This will be 2 for horizontal and vertical EOG
-
-    # Create empty array for windowed data
-    x_full = np.zeros((n_samples, aggregate, n_features))
-
-    # Fill the array with windowed data
-    for i, group_id in enumerate(full_groups):
-        mask = grouping_key_full == group_id
-        x_full[i] = df_x[mask].values
-
-    # Create target array (binary classification based on mean ISA > 3)
-    y_full = (
-        df_final_full["F_ISA"]
-        .groupby(grouping_key_full)
-        .mean()
-        .map(lambda x: x > 3)
-        .values
-    )
 
     return x_full, y_full
